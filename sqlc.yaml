@@ -1,0 +1,14 @@
+version: "2"  
+sql:
+  - engine: "postgresql"
+    queries: "./db/queries" # will refer a directory
+    schema: "./db/migrations" # will refer a directory
+    gen:
+      go:
+        package: "sql"
+        sql_package: "pgx/v5"
+        out: "sql"
+        overrides:
+          - db_type: "geometry"
+            go_type: "github.com/twpayne/go-geom.MultiPolygon"
+
