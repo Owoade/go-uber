@@ -46,13 +46,13 @@ type User struct {
 type Wallet struct {
 	ID         int32
 	UserId     pgtype.Int4
-	Balance    pgtype.Numeric
+	Balance    pgtype.Int8
 	LastFunded interface{}
 }
 
 type WalletTransaction struct {
 	ID       int32
 	WalletId pgtype.Int4
-	Amount   pgtype.Int4
+	Amount   pgtype.Int8
 	Type     pgtype.Text
 }

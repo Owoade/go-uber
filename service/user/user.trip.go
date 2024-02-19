@@ -1,6 +1,13 @@
 package service
 
-import "math"
+import (
+	"context"
+	"fmt"
+	"math"
+
+	"github.com/Owoade/go-uber/sql"
+	"github.com/jackc/pgx/v5/pgtype"
+)
 
 type Point struct {
 	Longitude float64
@@ -40,6 +47,60 @@ func calculateRideDistance(currentLoaction Point, destination Point) float64 {
 
 }
 
-func (s *UserService) RequestForARide(currentLocation Point, destination Point, userId int32) {
+func getRidePrice(distance float64) int64 {
+	return int64(3 * distance)
+}
+
+func (s *UserService) RequestForARide(currentLocation Point, destination Point, userId int32) int64 {
+
+	rideDistance := calculateRideDistance(currentLocation, destination)
+
+	ridePrice := getRidePrice(rideDistance)
+
+	return ridePrice
+
+}
+
+func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId int32) (sql.Trip, error) {
+
+	UserId := pgtype.Int4{
+		Int32: userId,
+		Valid: true,
+	}
+
+	wallet, err := s.repo.GetWallet(ctx, UserId)
+
+	if err != nil {
+		return *new(sql.Trip), err
+	}
+
+	if wallet.Balance.Int64 < ridePrice {
+		return *new(sql.Trip), fmt.Errorf("Insufficient balance")
+	}
+
+	// create a transaction
+
+	s.repo.CreateWalletTransaction(ctx, sql.CreateWalletTransactionParams{
+		WalletId: pgtype.Int4{
+			Int32: wallet.ID,
+		},
+		Amount: pgtype.Int8{
+			Int64: ridePrice,
+		},
+		Type: pgtype.Text{
+			String: "debit",
+		},
+	})
+
+	s.repo.UpdateBalance(ctx, sql.UpdateBalanceParams{
+		Balance: pgtype.Int8{
+			Int64: -ridePrice,
+		},
+		UserId: pgtype.Int4{
+			Int32: userId,
+		},
+	})
+
+	// create trip
 
 }

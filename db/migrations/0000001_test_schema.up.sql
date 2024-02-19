@@ -7,14 +7,14 @@ CREATE TABLE "users" (
 CREATE TABLE "wallets" (
   "id" serial PRIMARY KEY,
   "userId" int,
-  "balance" numeric,
+  "balance" BIGINT,
   "lastFunded" timestampz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "wallet_transaction" (
+CREATE TABLE "wallet_transactions" (
   "id" serial PRIMARY KEY,
   "walletId" int,
-  "amount" serial,
+  "amount" BIGiNT,
   "type" text
 );
 
