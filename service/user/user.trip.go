@@ -61,7 +61,7 @@ func (s *UserService) RequestForARide(currentLocation Point, destination Point, 
 
 }
 
-func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId int32) (sql.Trip, error) {
+func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId int32, pickupLocation Point, destination Point) (sql.Trip, error) {
 
 	UserId := pgtype.Int4{
 		Int32: userId,
@@ -80,7 +80,7 @@ func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId 
 
 	// create a transaction
 
-	s.repo.CreateWalletTransaction(ctx, sql.CreateWalletTransactionParams{
+	tripTransaction, err := s.repo.CreateWalletTransaction(ctx, sql.CreateWalletTransactionParams{
 		WalletId: pgtype.Int4{
 			Int32: wallet.ID,
 		},
@@ -92,6 +92,10 @@ func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId 
 		},
 	})
 
+	if err != nil {
+		return *new(sql.Trip), fmt.Errorf(err.Error())
+	}
+
 	s.repo.UpdateBalance(ctx, sql.UpdateBalanceParams{
 		Balance: pgtype.Int8{
 			Int64: -ridePrice,
@@ -102,5 +106,33 @@ func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId 
 	})
 
 	// create trip
+
+	newTrip, err := s.repo.CreateTrip(ctx, sql.CreateTripParams{
+		TransactionId: pgtype.Int4{
+			Int32: tripTransaction.ID,
+			Valid: true,
+		},
+		UserId: UserId,
+		PickUpLocation: pgtype.Point{
+			P: pgtype.Vec2{
+				X: pickupLocation.Longitude,
+				Y: pickupLocation.Latitude,
+			},
+			Valid: true,
+		},
+		Destination: pgtype.Point{
+			P: pgtype.Vec2{
+				X: destination.Longitude,
+				Y: destination.Latitude,
+			},
+			Valid: true,
+		},
+	})
+
+	if err != nil {
+		return *new(sql.Trip), fmt.Errorf(err.Error())
+	}
+
+	return newTrip, nil
 
 }
