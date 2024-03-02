@@ -7,7 +7,6 @@ import (
 
 	"github.com/Owoade/go-uber/sql"
 	"github.com/Owoade/go-uber/utils"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type AuthResponse struct {
@@ -17,10 +16,7 @@ type AuthResponse struct {
 
 func (s *UserService) Login(ctx context.Context, email string, password string) (AuthResponse, error) {
 
-	Email := pgtype.Text{
-		String: email,
-		Valid:  true,
-	}
+	Email := utils.SqlTypeText(email)
 
 	existingUser, err := s.repo.GetUser(ctx, Email)
 
@@ -51,10 +47,7 @@ func (s *UserService) Login(ctx context.Context, email string, password string) 
 
 func (s *UserService) SignUp(ctx context.Context, email string, password string) (AuthResponse, error) {
 
-	Email := pgtype.Text{
-		String: email,
-		Valid:  true,
-	}
+	Email := utils.SqlTypeText(email)
 
 	existingUser, err := s.repo.GetUser(ctx, Email)
 
@@ -68,10 +61,7 @@ func (s *UserService) SignUp(ctx context.Context, email string, password string)
 
 	password, _ = utils.HashPassword(password)
 
-	Password := pgtype.Text{
-		String: password,
-		Valid:  true,
-	}
+	Password := utils.SqlTypeText(password)
 
 	newUser, err := s.repo.CreateUser(ctx, sql.CreateUserParams{
 		Email:    Email,
