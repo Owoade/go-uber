@@ -7,7 +7,6 @@ import (
 
 	"github.com/Owoade/go-uber/sql"
 	"github.com/Owoade/go-uber/utils"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type AuthResponse struct {
@@ -17,10 +16,7 @@ type AuthResponse struct {
 
 func (s *DriverService) Login(ctx context.Context, email string, password string) (AuthResponse, error) {
 
-	Email := pgtype.Text{
-		String: email,
-		Valid:  true,
-	}
+	Email := utils.SqlTypeText(email)
 
 	existingDriver, err := s.repo.GetDriver(ctx, Email)
 
@@ -51,10 +47,7 @@ func (s *DriverService) Login(ctx context.Context, email string, password string
 
 func (s *DriverService) SignUp(ctx context.Context, email string, password string) (AuthResponse, error) {
 
-	Email := pgtype.Text{
-		String: email,
-		Valid:  true,
-	}
+	Email := utils.SqlTypeText(email)
 
 	existingDriver, err := s.repo.GetDriver(ctx, Email)
 
@@ -68,10 +61,7 @@ func (s *DriverService) SignUp(ctx context.Context, email string, password strin
 
 	password, _ = utils.HashPassword(password)
 
-	Password := pgtype.Text{
-		String: password,
-		Valid:  true,
-	}
+	Password := utils.SqlTypeText(email)
 
 	newDriver, err := s.repo.CreateUser(ctx, sql.CreateUserParams{
 		Email:    Email,
