@@ -8,7 +8,7 @@ INSERT INTO "wallets" (
 ) RETURNING *;
 
 -- name: GetWallet :one
-SELECT balance FROM "wallets" WHERE "userId"=$1;
+SELECT balance, id FROM "wallets" WHERE "userId"=$1;
 
 -- name: UpdateBalance :one
 UPDATE "wallets" SET balance = balance + $1 WHERE "userId" = $2 RETURNING *;

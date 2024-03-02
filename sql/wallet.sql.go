@@ -23,7 +23,7 @@ INSERT INTO "wallets" (
 
 type CreateWalletParams struct {
 	UserId  pgtype.Int4
-	Balance pgtype.Numeric
+	Balance pgtype.Int8
 }
 
 func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wallet, error) {
@@ -39,14 +39,19 @@ func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wal
 }
 
 const getWallet = `-- name: GetWallet :one
-SELECT balance FROM "wallets" WHERE "userId"=$1
+SELECT balance, id FROM "wallets" WHERE "userId"=$1
 `
 
-func (q *Queries) GetWallet(ctx context.Context, userid pgtype.Int4) (pgtype.Numeric, error) {
+type GetWalletRow struct {
+	Balance pgtype.Int8
+	ID      int32
+}
+
+func (q *Queries) GetWallet(ctx context.Context, userid pgtype.Int4) (GetWalletRow, error) {
 	row := q.db.QueryRow(ctx, getWallet, userid)
-	var balance pgtype.Numeric
-	err := row.Scan(&balance)
-	return balance, err
+	var i GetWalletRow
+	err := row.Scan(&i.Balance, &i.ID)
+	return i, err
 }
 
 const updateBalance = `-- name: UpdateBalance :one
@@ -54,7 +59,7 @@ UPDATE "wallets" SET balance = balance + $1 WHERE "userId" = $2 RETURNING id, "u
 `
 
 type UpdateBalanceParams struct {
-	Balance pgtype.Numeric
+	Balance pgtype.Int8
 	UserId  pgtype.Int4
 }
 

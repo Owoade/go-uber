@@ -112,4 +112,5 @@ func (s *UserService) AuthorizeUser(ctx context.Context, token string) (int32, e
 	}
 
 	return user.ID, nil
+
 }
