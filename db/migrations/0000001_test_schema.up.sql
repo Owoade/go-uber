@@ -43,6 +43,7 @@ CREATE TABLE "trip" (
   "pickUpLocation" point,
   "destination" point,
   "currentTripLocation" point,
+  "currentTripLocationFromUser" point,
   "tripStartedAt" timestampz NOT NULL DEFAULT (now()),
   "tripEndedAt" timestampz NOT NULL DEFAULT (now())
 );

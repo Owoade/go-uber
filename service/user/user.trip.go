@@ -136,3 +136,5 @@ func (s *UserService) InitiateTrip(ctx context.Context, ridePrice int64, userId 
 	return newTrip, nil
 
 }
+
+func (s *UserService) UpdateTripLocation()

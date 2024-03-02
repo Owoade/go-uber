@@ -26,15 +26,16 @@ type Driver struct {
 }
 
 type Trip struct {
-	ID                  int32
-	UserId              pgtype.Int4
-	DriverId            pgtype.Int4
-	TransactionId       pgtype.Int4
-	PickUpLocation      pgtype.Point
-	Destination         pgtype.Point
-	CurrentTripLocation pgtype.Point
-	TripStartedAt       interface{}
-	TripEndedAt         interface{}
+	ID                          int32
+	UserId                      pgtype.Int4
+	DriverId                    pgtype.Int4
+	TransactionId               pgtype.Int4
+	PickUpLocation              pgtype.Point
+	Destination                 pgtype.Point
+	CurrentTripLocation         pgtype.Point
+	CurrentTripLocationFromUser pgtype.Point
+	TripStartedAt               interface{}
+	TripEndedAt                 interface{}
 }
 
 type User struct {
