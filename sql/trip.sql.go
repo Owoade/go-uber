@@ -63,8 +63,8 @@ func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (Trip, e
 	return i, err
 }
 
-const updateTripLocationByDriver = `-- name: UpdateTripLocationByDriver :one
-UPDATE "trip" SET "currentTripLocation"=$1 WHERE id=$2 AND "driverId"=$3 RETURNING id, "userId", "driverId", "transactionId", "pickUpLocation", destination, "currentTripLocation", "currentTripLocationFromUser", "tripStartedAt", "tripEndedAt"
+const updateTripLocationByDriver = `-- name: UpdateTripLocationByDriver :exec
+UPDATE "trip" SET "currentTripLocation"=$1 WHERE id=$2 AND "driverId"=$3
 `
 
 type UpdateTripLocationByDriverParams struct {
@@ -73,26 +73,13 @@ type UpdateTripLocationByDriverParams struct {
 	DriverId            pgtype.Int4
 }
 
-func (q *Queries) UpdateTripLocationByDriver(ctx context.Context, arg UpdateTripLocationByDriverParams) (Trip, error) {
-	row := q.db.QueryRow(ctx, updateTripLocationByDriver, arg.CurrentTripLocation, arg.ID, arg.DriverId)
-	var i Trip
-	err := row.Scan(
-		&i.ID,
-		&i.UserId,
-		&i.DriverId,
-		&i.TransactionId,
-		&i.PickUpLocation,
-		&i.Destination,
-		&i.CurrentTripLocation,
-		&i.CurrentTripLocationFromUser,
-		&i.TripStartedAt,
-		&i.TripEndedAt,
-	)
-	return i, err
+func (q *Queries) UpdateTripLocationByDriver(ctx context.Context, arg UpdateTripLocationByDriverParams) error {
+	_, err := q.db.Exec(ctx, updateTripLocationByDriver, arg.CurrentTripLocation, arg.ID, arg.DriverId)
+	return err
 }
 
-const updateTripLocationByUser = `-- name: UpdateTripLocationByUser :one
-UPDATE "trip" SET "currentTripLocationFromUser"=$1 WHERE id=$2 AND "userId"=$3 RETURNING id, "userId", "driverId", "transactionId", "pickUpLocation", destination, "currentTripLocation", "currentTripLocationFromUser", "tripStartedAt", "tripEndedAt"
+const updateTripLocationByUser = `-- name: UpdateTripLocationByUser :exec
+UPDATE "trip" SET "currentTripLocationFromUser"=$1 WHERE id=$2 AND "userId"=$3
 `
 
 type UpdateTripLocationByUserParams struct {
@@ -101,20 +88,7 @@ type UpdateTripLocationByUserParams struct {
 	UserId                      pgtype.Int4
 }
 
-func (q *Queries) UpdateTripLocationByUser(ctx context.Context, arg UpdateTripLocationByUserParams) (Trip, error) {
-	row := q.db.QueryRow(ctx, updateTripLocationByUser, arg.CurrentTripLocationFromUser, arg.ID, arg.UserId)
-	var i Trip
-	err := row.Scan(
-		&i.ID,
-		&i.UserId,
-		&i.DriverId,
-		&i.TransactionId,
-		&i.PickUpLocation,
-		&i.Destination,
-		&i.CurrentTripLocation,
-		&i.CurrentTripLocationFromUser,
-		&i.TripStartedAt,
-		&i.TripEndedAt,
-	)
-	return i, err
+func (q *Queries) UpdateTripLocationByUser(ctx context.Context, arg UpdateTripLocationByUserParams) error {
+	_, err := q.db.Exec(ctx, updateTripLocationByUser, arg.CurrentTripLocationFromUser, arg.ID, arg.UserId)
+	return err
 }

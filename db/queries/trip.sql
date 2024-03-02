@@ -15,8 +15,8 @@ INSERT INTO "trip" (
     $6
 ) RETURNING *;
 
--- name: UpdateTripLocationByDriver :one
-UPDATE "trip" SET "currentTripLocation"=$1 WHERE id=$2 AND "driverId"=$3 RETURNING *;
+-- name: UpdateTripLocationByDriver :exec
+UPDATE "trip" SET "currentTripLocation"=$1 WHERE id=$2 AND "driverId"=$3;
 
--- name: UpdateTripLocationByUser :one
-UPDATE "trip" SET "currentTripLocationFromUser"=$1 WHERE id=$2 AND "userId"=$3 RETURNING *;
+-- name: UpdateTripLocationByUser :exec
+UPDATE "trip" SET "currentTripLocationFromUser"=$1 WHERE id=$2 AND "userId"=$3;
